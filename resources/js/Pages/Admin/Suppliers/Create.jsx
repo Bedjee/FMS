@@ -82,6 +82,19 @@ export default function CreateSupplier() {
                                     />
                                     {errors.email && <p className="mt-1 text-sm text-red-600">{errors.email}</p>}
                                 </div>
+
+
+                                <div>
+    <label className="block text-sm font-medium text-gray-700">Password (optional, default: 'password')</label>
+    <input
+        type="password"
+        value={data.password}
+        onChange={(e) => setData('password', e.target.value)}
+        className="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-slate-500 focus:ring-slate-500"
+        placeholder="Leave blank for default password"
+    />
+    {errors.password && <p className="mt-1 text-sm text-red-600">{errors.password}</p>}
+</div>
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700">
                                         Phone <span className="text-red-500">*</span>

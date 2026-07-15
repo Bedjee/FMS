@@ -20,31 +20,35 @@ class RegisteredUserController extends Controller
         return Inertia::render('Auth/Register');
     }
 
-    public function store(Request $request): RedirectResponse
-    {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|lowercase|email|max:255|unique:'.User::class,
-            'phone' => 'nullable|string|max:20',
-            'address' => 'nullable|string|max:500',
-            'password' => ['required', 'confirmed', Rules\Password::defaults()],
-        ]);
+  public function store(Request $request): RedirectResponse
+{
+    $request->validate([
+        'name' => 'required|string|max:255',
+        'email' => 'required|string|lowercase|email|max:255|unique:'.User::class,
+        'phone' => 'nullable|string|max:20',
+        'address' => 'nullable|string|max:500',
+        'password' => ['required', 'confirmed', Rules\Password::defaults()],
+    ]);
 
-        $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'phone' => $request->phone,
-            'address' => $request->address,
-            'password' => Hash::make($request->password),
-        ]);
+    $user = User::create([
+        'name' => $request->name,
+        'email' => $request->email,
+        'phone' => $request->phone,
+        'address' => $request->address,
+        'password' => Hash::make($request->password),
+    ]);
 
-        // Assign the 'Customer' role
-        $user->assignRole('Customer');
+    // Assign Customer role
+    $user->assignRole('Customer');
 
-        event(new Registered($user));
+    event(new Registered($user));
 
-        Auth::login($user);
+    Auth::login($user);
 
-        return redirect(route('dashboard', absolute: false));
-    }
+    // Redirect directly to customer dashboard
+    return redirect()->route('customer.dashboard');
+}
+
+
+
 }

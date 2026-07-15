@@ -57,6 +57,7 @@ export default function PurchaseOrdersIndex({ purchaseOrders }) {
                                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">PO #</th>
                                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Order Date</th>
                                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Total</th>
+                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Stock</th>
                                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
                                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
                             </tr>
@@ -68,6 +69,15 @@ export default function PurchaseOrdersIndex({ purchaseOrders }) {
                                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{po.order_date}</td>
                                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                                         ₱{getTotal(po.items).toFixed(2)}
+                                    </td>
+                                    <td className="px-6 py-4 whitespace-nowrap">
+                                        {po.can_confirm !== undefined ? (
+                                            <span className={`inline-flex rounded-full px-2 py-1 text-xs font-semibold ${po.can_confirm ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+                                                {po.can_confirm ? 'Sufficient' : 'Insufficient'}
+                                            </span>
+                                        ) : (
+                                            <span className="text-gray-400 text-xs">—</span>
+                                        )}
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap">
                                         <span className={`inline-flex rounded-full px-2 py-1 text-xs font-semibold ${statusColors[po.status] || 'bg-gray-100 text-gray-800'}`}>

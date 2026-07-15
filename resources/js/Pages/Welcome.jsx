@@ -217,6 +217,7 @@ export default function Welcome({ auth }) {
 
                             {/* Center links - hidden on mobile */}
                             <div className="hidden md:flex items-center space-x-8 text-sm font-medium text-[#5C4033]">
+                                  <Link href="/shop" className="hover:text-[#8B5E3C] transition">Shop</Link> {/* NEW */}
                                 <Link href="#features" className="hover:text-[#8B5E3C] transition">Features</Link>
                                 <Link href="#workflow" className="hover:text-[#8B5E3C] transition">Workflow</Link>
                                 <Link href="#why" className="hover:text-[#8B5E3C] transition">Why Choose</Link>

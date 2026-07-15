@@ -11,7 +11,7 @@ class User extends Authenticatable
     use HasApiTokens, HasRoles, Notifiable;
 
     protected $fillable = [
-        'name', 'email', 'password', 'phone', 'address', 'employee_id', 'specialization', 'role_id','supplier_id'
+        'name', 'email', 'password', 'phone', 'address', 'employee_id', 'specialization', 'role_id','supplier_id','available_capital'
     ];
 
     protected $hidden = ['password', 'remember_token'];
@@ -54,5 +54,14 @@ class User extends Authenticatable
     public function supplier()
 {
     return $this->belongsTo(Supplier::class);
+}
+
+public function deductCapital($amount)
+{
+    if ($this->available_capital < $amount) {
+        throw new \Exception('Insufficient capital.');
+    }
+    $this->available_capital -= $amount;
+    $this->save();
 }
 }

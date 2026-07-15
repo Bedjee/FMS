@@ -5,7 +5,9 @@ use Illuminate\Database\Eloquent\Model;
 
 class ProductVariant extends Model
 {
-    protected $fillable = ['product_id', 'wood_type', 'price', 'stock_quantity', 'low_stock_threshold'];
+   protected $fillable = ['product_id', 'wood_type','dimensions', 'finish', 'price', 'stock_quantity', 'low_stock_threshold'];
+
+
 
     public function product()
     {
@@ -34,4 +36,23 @@ class ProductVariant extends Model
             $this->inventory->decrement('quantity', $quantity);
         }
     }
+
+   public function transactions()
+{
+    return $this->hasMany(ProductInventoryTransaction::class, 'product_variant_id');
+}
+
+public function logTransaction($type, $quantity, $referenceType = null, $referenceId = null, $notes = null)
+{
+    return $this->transactions()->create([
+        'type' => $type,
+        'quantity' => $quantity,
+        'balance_after' => $this->stock_quantity,
+        'reference_type' => $referenceType,
+        'reference_id' => $referenceId,
+        'notes' => $notes,
+    ]);
+}
+
+
 }

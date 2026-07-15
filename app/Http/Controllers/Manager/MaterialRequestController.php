@@ -136,6 +136,8 @@ public function getSupplierMaterials(Request $request)
             $material = Material::findOrFail($itemData['material_id']);
             $quantity = (float) $itemData['quantity'];
             $unitPrice = (float) $itemData['unit_price'];
+            $woodType = $this->determineWoodType($material); // returns null for non-wood
+
 
             // Fallback to material price if unitPrice is zero
             if ($unitPrice == 0 && $material->price > 0) {
@@ -149,7 +151,7 @@ public function getSupplierMaterials(Request $request)
 
             $createdItem = $purchaseOrder->items()->create([
                 'material_id' => $material->id,
-                'wood_type' => $this->determineWoodType($material),
+                'wood_type' => $woodType, // can be null
                 'thickness' => 0,
                 'width' => 0,
                 'length' => 0,
@@ -189,7 +191,7 @@ private function determineWoodType($material)
     $name = strtolower($material->name);
     if (strpos($name, 'mahogany') !== false) return 'Mahogany';
     if (strpos($name, 'gemelina') !== false) return 'Gemelina';
-    return null;
+    return null; // not wood
 }
 
 }

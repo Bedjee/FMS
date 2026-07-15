@@ -28,6 +28,7 @@ export default function MaterialsIndex({ materials }) {
                                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Stock</th>
                                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Available</th>
                                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
+                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">History</th> {/* NEW */}
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-100">
@@ -50,13 +51,18 @@ export default function MaterialsIndex({ materials }) {
                                             Delete
                                         </button>
                                     </td>
+                                    <td className="px-6 py-4 whitespace-nowrap text-sm">
+                                        <Link href={route('supplier.materials.transactions', material.id)} className="text-purple-600 hover:text-purple-800">
+                                            View History
+                                        </Link>
+                                    </td>
                                 </tr>
                             ))}
                         </tbody>
                     </table>
                 </div>
 
-                {/* Custom Pagination */}
+                {/* Pagination */}
                 <div className="flex items-center justify-between border-t border-gray-200 bg-white px-4 py-3 sm:px-6">
                     <div className="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
                         <div>

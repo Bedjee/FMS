@@ -57,31 +57,39 @@ export default function MarkAsDeliveredModal({ isOpen, onClose, request, onSucce
         e.preventDefault();
         if (isSubmitting) return;
 
+        // Convert empty values to 0 for submission
+        const thickness = data.dimensions_unknown ? 0 : parseFloat(data.thickness) || 0;
+        const width = data.dimensions_unknown ? 0 : parseFloat(data.width) || 0;
+        const length = data.dimensions_unknown ? 0 : parseFloat(data.length) || 0;
+        const quantity = parseFloat(data.quantity) || 0;
+
+        if (quantity <= 0) {
+            toast.error('Please enter a valid quantity.');
+            return;
+        }
+
         const payload = {
             dimensions_unknown: data.dimensions_unknown,
-            thickness: data.dimensions_unknown ? 0 : parseFloat(data.thickness) || 0,
-            width: data.dimensions_unknown ? 0 : parseFloat(data.width) || 0,
-            length: data.dimensions_unknown ? 0 : parseFloat(data.length) || 0,
-            quantity: parseFloat(data.quantity) || 0,
+            thickness: thickness,
+            width: width,
+            length: length,
+            quantity: quantity,
         };
 
         setIsSubmitting(true);
 
         router.post(route('admin.material-requests.mark-delivered', request.id), payload, {
             onSuccess: () => {
-                // Success: close modal immediately
                 onClose();
                 reset();
-                // Show toast
                 toast.success(' Stock entry recorded successfully.', { duration: 3000 });
-                // Reload after a delay
                 setTimeout(() => {
                     if (onSuccess) onSuccess();
                 }, 1500);
                 setIsSubmitting(false);
             },
             onError: (error) => {
-                toast.error('❌ Failed to record stock entry. Please try again.', { duration: 4000 });
+                toast.error(' Failed to record stock entry. Please try again.', { duration: 4000 });
                 console.error(error);
                 setIsSubmitting(false);
             },
@@ -99,7 +107,7 @@ export default function MarkAsDeliveredModal({ isOpen, onClose, request, onSucce
                     Mark as Delivered
                 </h3>
                 <p className="mt-1 text-sm text-gray-500">
-                    Record the received materials.
+                    Record the received materials. Dimensions are optional – leave blank for non‑wood materials.
                 </p>
 
                 <div className="mt-4 p-3 bg-blue-50 rounded-lg border border-blue-200">
@@ -126,7 +134,7 @@ export default function MarkAsDeliveredModal({ isOpen, onClose, request, onSucce
                         <>
                             <div className="grid grid-cols-3 gap-4">
                                 <div>
-                                    <label className="block text-xs font-medium text-gray-500">Thickness (in)</label>
+                                    <label className="block text-xs font-medium text-gray-500">Thickness (in) <span className="text-gray-400">(optional)</span></label>
                                     <input
                                         type="number"
                                         step="0.25"
@@ -139,7 +147,7 @@ export default function MarkAsDeliveredModal({ isOpen, onClose, request, onSucce
                                     {errors.thickness && <p className="mt-1 text-xs text-red-600">{errors.thickness}</p>}
                                 </div>
                                 <div>
-                                    <label className="block text-xs font-medium text-gray-500">Width (in)</label>
+                                    <label className="block text-xs font-medium text-gray-500">Width (in) <span className="text-gray-400">(optional)</span></label>
                                     <input
                                         type="number"
                                         step="0.25"
@@ -152,7 +160,7 @@ export default function MarkAsDeliveredModal({ isOpen, onClose, request, onSucce
                                     {errors.width && <p className="mt-1 text-xs text-red-600">{errors.width}</p>}
                                 </div>
                                 <div>
-                                    <label className="block text-xs font-medium text-gray-500">Length (ft)</label>
+                                    <label className="block text-xs font-medium text-gray-500">Length (ft) <span className="text-gray-400">(optional)</span></label>
                                     <input
                                         type="number"
                                         step="0.5"

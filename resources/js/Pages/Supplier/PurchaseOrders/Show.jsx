@@ -12,6 +12,7 @@ export default function PurchaseOrderShow({ purchaseOrder }) {
     };
 
     const total = purchaseOrder.items.reduce((sum, item) => sum + parseFloat(item.line_total || 0), 0);
+    const canConfirm = purchaseOrder.can_confirm;
 
     const handleConfirm = () => {
         if (confirm('Confirm this purchase order?')) {
@@ -78,6 +79,7 @@ export default function PurchaseOrderShow({ purchaseOrder }) {
                                         <th className="px-4 py-2 text-left text-xs font-medium text-gray-500">Unit</th>
                                         <th className="px-4 py-2 text-left text-xs font-medium text-gray-500">Unit Price</th>
                                         <th className="px-4 py-2 text-left text-xs font-medium text-gray-500">Subtotal</th>
+                                        <th className="px-4 py-2 text-left text-xs font-medium text-gray-500">Available Stock</th>
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-gray-100">
@@ -88,12 +90,21 @@ export default function PurchaseOrderShow({ purchaseOrder }) {
                                             <td className="px-4 py-2 text-sm text-gray-500">{item.material?.unit || 'BF'}</td>
                                             <td className="px-4 py-2 text-sm text-gray-500">₱{item.unit_price}</td>
                                             <td className="px-4 py-2 text-sm text-gray-900">₱{item.line_total}</td>
+                                            <td className="px-4 py-2 text-sm text-gray-500">
+                                                {item.material ? (
+                                                    <span className={item.material.stock_quantity >= item.quantity ? 'text-green-600' : 'text-red-600'}>
+                                                        {item.material.stock_quantity} {item.material.unit}
+                                                    </span>
+                                                ) : (
+                                                    '—'
+                                                )}
+                                            </td>
                                         </tr>
                                     ))}
                                 </tbody>
                                 <tfoot className="bg-gray-50">
                                     <tr>
-                                        <td colSpan="4" className="px-4 py-2 text-sm font-semibold text-gray-900 text-right">Total:</td>
+                                        <td colSpan="5" className="px-4 py-2 text-sm font-semibold text-gray-900 text-right">Total:</td>
                                         <td className="px-4 py-2 text-sm font-bold text-gray-900">₱{total.toFixed(2)}</td>
                                     </tr>
                                 </tfoot>
@@ -103,25 +114,42 @@ export default function PurchaseOrderShow({ purchaseOrder }) {
 
                     {/* Action Buttons */}
                     {purchaseOrder.status === 'sent' && (
-                        <div className="flex gap-4 pt-4 border-t border-gray-200">
-                            <button
-                                onClick={handleConfirm}
-                                className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50"
-                            >
-                                Confirm Order
-                            </button>
-                            <button
-                                onClick={handleReject}
-                                className="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50"
-                            >
-                                Reject Order
-                            </button>
+                        <div className="flex flex-col gap-4 pt-4 border-t border-gray-200">
+                            {canConfirm ? (
+                                <div className="flex gap-4">
+                                    <button
+                                        onClick={handleConfirm}
+                                        className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
+                                    >
+                                        Confirm Order
+                                    </button>
+                                    <button
+                                        onClick={handleReject}
+                                        className="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
+                                    >
+                                        Reject Order
+                                    </button>
+                                </div>
+                            ) : (
+                                <div className="flex gap-4">
+                                    <div className="p-3 bg-red-50 rounded-lg border border-red-200 text-red-700 flex-1">
+                                        <strong>⚠️ Insufficient Stock</strong>
+                                        <p className="text-sm mt-1">Please restock your materials before confirming this order.</p>
+                                    </div>
+                                    <button
+                                        onClick={handleReject}
+                                        className="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
+                                    >
+                                        Reject Order
+                                    </button>
+                                </div>
+                            )}
                         </div>
                     )}
 
                     {purchaseOrder.status === 'confirmed' && (
                         <div className="p-4 bg-green-50 rounded-lg border border-green-200 text-green-700">
-                            <strong>Order Confirmed.</strong> You have confirmed this purchase order.
+                            <strong>Order Confirmed.</strong> You have confirmed this purchase order. Stock has been deducted.
                         </div>
                     )}
 

@@ -1,89 +1,58 @@
 import { useState } from 'react';
 import { Link, usePage } from '@inertiajs/react';
-import {
-    HomeIcon,
-    TruckIcon,
-    ArrowRightOnRectangleIcon,
-} from '@heroicons/react/24/outline';
+import { HomeIcon, TruckIcon, UserIcon, ArrowRightOnRectangleIcon } from '@heroicons/react/24/outline';
 
 export default function DriverLayout({ children }) {
     const { auth } = usePage().props;
     const user = auth?.user;
     const [sidebarOpen, setSidebarOpen] = useState(false);
 
-    const colors = {
-        blue: '#3B82F6',       // blue-500
-        darkBlue: '#2563EB',   // blue-600
-        veryDarkBlue: '#1D4ED8', // blue-700
-        white: '#FFFFFF',
-    };
-
     const navigation = [
         { name: 'Dashboard', href: route('driver.dashboard'), icon: HomeIcon },
-
+        { name: 'My Deliveries', href: route('driver.orders.index'), icon: TruckIcon },
+        { name: 'Profile', href: route('profile.edit'), icon: UserIcon },
     ];
 
     return (
-        <div className="min-h-screen" style={{ backgroundColor: colors.white }}>
-            {sidebarOpen && (
-                <div className="fixed inset-0 z-20 bg-black/50 lg:hidden" onClick={() => setSidebarOpen(false)} />
-            )}
-
-            <aside
-                className={`fixed inset-y-0 left-0 z-30 w-64 transform shadow-lg transition-transform duration-300 ease-in-out lg:translate-x-0 ${
-                    sidebarOpen ? 'translate-x-0' : '-translate-x-full'
-                }`}
-                style={{ backgroundColor: colors.blue }}
-            >
-                <div className="flex h-16 items-center justify-center border-b border-white/20">
-                    <h1 className="text-xl font-bold text-white">FurnitureMES</h1>
-                    <p className="ml-2 text-xs text-white/70">Driver</p>
-                </div>
-
-                <nav className="mt-6 px-4 space-y-2">
-                    {navigation.map((item) => {
-                        const isActive = route().current(item.href.split('/').pop());
-                        return (
-                            <Link
-                                key={item.name}
-                                href={item.href}
-                                className={`flex items-center gap-3 rounded-lg px-4 py-2 text-white/80 transition hover:bg-white/10 hover:text-white ${
-                                    isActive ? 'bg-white/10 text-white' : ''
-                                }`}
-                            >
-                                <item.icon className="h-5 w-5" />
-                                <span>{item.name}</span>
-                            </Link>
-                        );
-                    })}
-                </nav>
-
-                <div className="absolute bottom-0 w-full border-t border-white/20 p-4">
-                    <div className="flex items-center justify-between">
-                        <div>
-                            <p className="text-sm font-medium text-white">{user?.name}</p>
-                            <p className="text-xs text-white/70">{user?.email}</p>
+        <div className="min-h-screen bg-gray-50">
+            {/* Navbar */}
+            <nav className="bg-white border-b border-gray-200">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div className="flex justify-between h-16">
+                        <div className="flex items-center">
+                            <Link href="/" className="text-xl font-bold text-amber-800">FurnitureMES</Link>
                         </div>
-                        <Link href={route('logout')} method="post" as="button" className="text-white/70 hover:text-white">
-                            <ArrowRightOnRectangleIcon className="h-5 w-5" />
-                        </Link>
+                        <div className="flex items-center gap-4">
+                            <span className="text-sm text-gray-700">{user?.name}</span>
+                            <Link href={route('logout')} method="post" as="button" className="text-sm text-red-600 hover:text-red-800">Logout</Link>
+                        </div>
                     </div>
                 </div>
-            </aside>
+            </nav>
 
-            <div className="lg:ml-64">
-                <header className="sticky top-0 z-10 shadow-sm border-b bg-white border-gray-200">
-                    <div className="flex items-center justify-between px-6 py-3">
-                        <button className="lg:hidden" onClick={() => setSidebarOpen(true)}>
-                            <svg className="h-6 w-6" style={{ color: colors.blue }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-                            </svg>
-                        </button>
-                        <h2 className="text-lg font-semibold text-gray-800">Driver Portal</h2>
-                        <div className="w-6 lg:hidden" />
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+                    {/* Sidebar */}
+                    <div className="md:col-span-1">
+                        <div className="bg-white rounded-lg shadow p-4 space-y-1">
+                            {navigation.map((item) => (
+                                <Link
+                                    key={item.name}
+                                    href={item.href}
+                                    className="flex items-center gap-3 px-3 py-2 text-sm text-gray-700 rounded-md hover:bg-gray-100"
+                                >
+                                    <item.icon className="h-5 w-5" />
+                                    {item.name}
+                                </Link>
+                            ))}
+                        </div>
                     </div>
-                </header>
-                <main className="p-6">{children}</main>
+
+                    {/* Main content */}
+                    <div className="md:col-span-3">
+                        {children}
+                    </div>
+                </div>
             </div>
         </div>
     );

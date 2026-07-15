@@ -5,14 +5,17 @@ use Illuminate\Database\Eloquent\Model;
 
 class BomItem extends Model
 {
-    protected $fillable = [
-        'product_id', 'wood_type', 'board_feet_required',
-        'labor_cost', 'varnish_cost', 'other_cost'
-    ];
+    protected $fillable = ['product_id', 'material_id', 'quantity', 'unit', 'notes'];
 
     public function product()
     {
         return $this->belongsTo(Product::class);
+    }
+
+     // Add this relationship
+    public function material()
+    {
+        return $this->belongsTo(Material::class);
     }
 
     public static function calculateCost($productId, $quantity = 1)

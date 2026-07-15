@@ -15,21 +15,21 @@ export default function RawMaterialShow({ material }) {
                 <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 space-y-6">
                     <div className="grid grid-cols-2 gap-4">
                         <div>
-                            <p className="text-sm text-gray-500">Wood Type</p>
-                            <p className="font-medium">{material.wood_type}</p>
-                        </div>
-                        <div>
-                            <p className="text-sm text-gray-500">Board Feet</p>
-                            <p className="font-medium">{material.board_feet} BF</p>
-                        </div>
-                        <div>
-    <p className="text-sm text-gray-500">Dimensions</p>
-    <p className="font-medium">
-        {material.thickness > 0 && material.width > 0 && material.length > 0
-            ? `${material.thickness}" x ${material.width}" x ${material.length}'`
-            : '—'}
-    </p>
+    <p className="text-sm text-gray-500">Material</p>
+    <p className="font-medium">{material.material_name}</p>
 </div>
+<div>
+    <p className="text-sm text-gray-500">Quantity</p>
+    <p className="font-medium">{material.board_feet} {material.unit || 'BF'}</p>
+</div>
+                        <div>
+                            <p className="text-sm text-gray-500">Dimensions</p>
+                            <p className="font-medium">
+                                {material.thickness > 0 && material.width > 0 && material.length > 0
+                                    ? `${material.thickness}" x ${material.width}" x ${material.length}'`
+                                    : '—'}
+                            </p>
+                        </div>
                         <div>
                             <p className="text-sm text-gray-500">Delivery Date</p>
                             <p className="font-medium">{material.delivery_date}</p>

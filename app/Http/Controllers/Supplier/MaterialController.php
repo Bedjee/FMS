@@ -76,4 +76,21 @@ class MaterialController extends Controller
         $material->delete();
         return back()->with('success', 'Material deleted.');
     }
+
+
+    public function transactions(Material $material)
+{
+    if ($material->supplier_id !== auth()->user()->supplier->id) {
+        abort(403);
+    }
+
+    $transactions = $material->inventoryTransactions()
+        ->orderBy('created_at', 'desc')
+        ->paginate(20);
+
+    return Inertia::render('Supplier/Materials/Transactions', [
+        'material' => $material,
+        'transactions' => $transactions,
+    ]);
+}
 }

@@ -1,5 +1,4 @@
 <?php
-// app/Http/Controllers/Manager/RawMaterialController.php
 
 namespace App\Http\Controllers\Manager;
 
@@ -19,16 +18,17 @@ class RawMaterialController extends Controller
             ->orderBy('delivery_date', 'desc')
             ->paginate(15);
 
-        $summary = [
-            'Mahogany' => RawMaterial::where('wood_type', 'Mahogany')->sum('board_feet'),
-            'Gemelina' => RawMaterial::where('wood_type', 'Gemelina')->sum('board_feet'),
-        ];
+        // Group by material_name (renamed from wood_type)
+        $summary = RawMaterial::select('material_name', DB::raw('SUM(board_feet) as total'))
+            ->groupBy('material_name')
+            ->pluck('total', 'material_name')
+            ->toArray();
 
-        $lowStockThreshold = 100; // board feet
+        $lowStockThreshold = 100;
         $lowStockAlerts = [];
-        foreach ($summary as $wood => $total) {
+        foreach ($summary as $material => $total) {
             if ($total < $lowStockThreshold) {
-                $lowStockAlerts[$wood] = $total;
+                $lowStockAlerts[$material] = $total;
             }
         }
 
@@ -72,7 +72,7 @@ class RawMaterialController extends Controller
             }
 
             RawMaterial::create([
-                'wood_type' => $validated['wood_type'],
+                'material_name' => $validated['wood_type'], // map to new column
                 'board_feet' => $totalBF,
                 'thickness' => $validated['thickness'],
                 'width' => $validated['width'],
@@ -90,8 +90,6 @@ class RawMaterialController extends Controller
 
     public function toggleLowStockAlert(Request $request, RawMaterial $rawMaterial)
     {
-        // This is a placeholder – you can store a setting per material or globally.
-        // For now, we'll just return a success message.
         return back()->with('success', 'Alert settings updated.');
     }
 }

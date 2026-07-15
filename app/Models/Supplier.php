@@ -8,7 +8,7 @@ class Supplier extends Model
 {
     use SoftDeletes;
 
-    protected $fillable = ['name', 'contact_person', 'email', 'phone', 'address','category'];
+    protected $fillable = ['name', 'contact_person', 'email', 'phone', 'address','category','total_revenue'];
 
 
     public function materials()
@@ -32,4 +32,11 @@ class Supplier extends Model
     {
         return $this->hasMany(RawMaterial::class);
     }
+
+
+    public function addRevenue($amount)
+{
+    $this->total_revenue += $amount;
+    $this->save();
+}
 }

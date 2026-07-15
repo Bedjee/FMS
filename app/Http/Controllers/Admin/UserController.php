@@ -32,17 +32,21 @@ class UserController extends Controller
     }
 
     public function store(Request $request)
-    {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users',
-            'password' => 'required|string|min:8|confirmed',
-            'phone' => 'nullable|string|max:20',
-            'address' => 'nullable|string|max:500',
-            'employee_id' => 'nullable|string|unique:users',
-            'specialization' => 'nullable|string|max:255',
-            'role' => 'required|exists:roles,name',
-        ]);
+{
+    $validated = $request->validate([
+        'name' => 'required|string|max:255',
+        'email' => 'required|email|unique:users,email',
+        'password' => 'required|string|min:8',
+        'phone' => 'nullable|string|max:20',
+        'address' => 'nullable|string',
+        'employee_id' => 'nullable|string|unique:users,employee_id',
+        'role' => 'required|exists:roles,name',
+    ]);
+
+    // Prevent creating Supplier users via User Management
+    if ($validated['role'] === 'Supplier') {
+        return back()->with('error', 'Please use the Add Supplier module to create supplier accounts.');
+    }
 
         $user = User::create([
             'name' => $validated['name'],
@@ -112,4 +116,11 @@ class UserController extends Controller
         return redirect()->route('admin.users.index')
             ->with('success', 'User deleted successfully.');
     }
+
+
+    public function getDrivers()
+{
+    $drivers = User::role('Delivery Driver')->get(['id', 'name', 'email']);
+    return response()->json($drivers);
+}
 }

@@ -79,10 +79,8 @@ class MaterialRequestController extends Controller
     ]);
 }
 
-    // Mark request as delivered and create stock-in entries
-  public function markAsDelivered(Request $request, MaterialRequest $materialRequest)
+    public function markAsDelivered(Request $request, MaterialRequest $materialRequest)
 {
-    // Only allow if status is 'ordered'
     if ($materialRequest->status !== 'ordered') {
         return back()->with('error', 'Only ordered requests can be marked as delivered.');
     }
@@ -95,47 +93,57 @@ class MaterialRequestController extends Controller
         return back()->with('error', 'Purchase order must be confirmed by supplier first.');
     }
 
-    // Validate input
     $validated = $request->validate([
         'dimensions_unknown' => 'required|boolean',
-        'thickness' => 'required_if:dimensions_unknown,false|numeric|min:0.25',
-        'width' => 'required_if:dimensions_unknown,false|numeric|min:0.25',
-        'length' => 'required_if:dimensions_unknown,false|numeric|min:0.5',
+        'thickness' => 'nullable|numeric|min:0',
+        'width' => 'nullable|numeric|min:0',
+        'length' => 'nullable|numeric|min:0',
         'quantity' => 'required|numeric|min:0.01',
     ]);
 
     DB::transaction(function () use ($validated, $materialRequest, $purchaseOrder) {
-        // Update request status
         $materialRequest->update(['status' => 'delivered']);
-
-        // Update purchase order status
         $purchaseOrder->update(['status' => 'delivered']);
 
         $items = $materialRequest->items;
+        $thickness = $validated['thickness'] ?? 0;
+        $width = $validated['width'] ?? 0;
+        $length = $validated['length'] ?? 0;
+        $quantity = $validated['quantity'];
 
         foreach ($items as $item) {
-            if ($validated['dimensions_unknown']) {
-                // If dimensions unknown, distribute total BF equally among items
-                $itemBF = $validated['quantity'] / $items->count();
+            // Determine unit and material name
+            if ($item->item_type === 'varnish') {
+                $materialName = 'Varnish';
+                $unit = 'Liters';
+            } elseif ($item->item_type === 'other') {
+                $materialName = $item->description ?? 'Other';
+                $unit = $item->unit ?? 'units';
+            } else {
+                $materialName = $item->wood_type ?? 'Mahogany';
+                $unit = $item->unit ?? 'BF';
+            }
+
+            // Calculate quantity
+            if ($item->item_type === 'wood' && $thickness > 0 && $width > 0 && $length > 0) {
+                $bfPerPiece = ($thickness * $width * $length) / 12;
+                $itemBF = $bfPerPiece * $quantity;
+                $remarks = 'Stock-in from Material Request: ' . $materialRequest->request_number;
+            } else {
+                $itemBF = $quantity / $items->count();
                 $thickness = 0;
                 $width = 0;
                 $length = 0;
-                $remarks = 'Dimensions unknown - total BF: ' . $validated['quantity'];
-            } else {
-                // Calculate BF per piece based on dimensions
-                $bfPerPiece = ($validated['thickness'] * $validated['width'] * $validated['length']) / 12;
-                $itemBF = $bfPerPiece * $validated['quantity'];
-                $thickness = $validated['thickness'];
-                $width = $validated['width'];
-                $length = $validated['length'];
-                $remarks = 'Stock-in from Material Request: ' . $materialRequest->request_number;
+                $remarks = $item->item_type === 'varnish'
+                    ? 'Varnish stock-in from Material Request: ' . $materialRequest->request_number
+                    : 'Stock-in from Material Request: ' . $materialRequest->request_number;
             }
 
-            $woodType = $item->wood_type ?? 'Mahogany';
-
-            RawMaterial::create([
-                'wood_type' => $woodType,
+            // Save raw material
+            $rawMaterial = RawMaterial::create([
+                'material_name' => $materialName,
                 'board_feet' => $itemBF,
+                'unit' => $unit,
                 'thickness' => $thickness,
                 'width' => $width,
                 'length' => $length,
@@ -145,13 +153,24 @@ class MaterialRequestController extends Controller
                 'delivery_date' => now(),
                 'remarks' => $remarks,
             ]);
+
+            if ($item->material_id) {
+    \App\Models\MaterialInventory::add(
+    $item->material_id,
+    $itemBF,
+    'purchase_order',
+    $purchaseOrder->id,
+    'Stock-in from Material Request: ' . $materialRequest->request_number
+);
+}
+
+
         }
     });
 
     return redirect()->route('admin.material-requests.show', $materialRequest)
         ->with('success', 'Materials marked as delivered. Stock-in entries created successfully.');
 }
-
 
 
 

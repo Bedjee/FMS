@@ -34,24 +34,23 @@ class AuthenticatedSessionController extends Controller
 
     $user = Auth::user();
 
-    // Role-based redirect
     if ($user->hasRole('Owner')) {
-        return redirect()->intended(route('owner.dashboard'));
+        return redirect()->route('owner.dashboard');
     } elseif ($user->hasRole('Admin')) {
-        return redirect()->intended(route('admin.dashboard'));  // <-- ADD THIS
+        return redirect()->route('admin.dashboard');
     } elseif ($user->hasRole('Manager')) {
-        return redirect()->intended(route('manager.dashboard'));
+        return redirect()->route('manager.dashboard');
     } elseif ($user->hasRole('Supplier')) {
-        return redirect()->intended(route('supplier.dashboard'));
+        return redirect()->route('supplier.dashboard');
     } elseif ($user->hasRole('Skiller')) {
-        return redirect()->intended(route('skiller.dashboard'));
+        return redirect()->route('skiller.dashboard');
     } elseif ($user->hasRole('Carpenter')) {
-        return redirect()->intended(route('carpenter.dashboard'));
+        return redirect()->route('carpenter.dashboard');
     } elseif ($user->hasRole('Delivery Driver')) {
-        return redirect()->intended(route('driver.dashboard'));
+        return redirect()->route('driver.dashboard');
     } else {
         // Customer or fallback
-        return redirect()->intended(route('shop'));
+        return redirect()->route('customer.dashboard');
     }
 }
 

@@ -9,9 +9,9 @@ class RawMaterial extends Model
     use SoftDeletes;
 
     protected $fillable = [
-    'wood_type', 'board_feet', 'thickness', 'width', 'length',
-    'supplier_id', 'purchase_order_id', 'delivery_date',
-    'receipt_path', 'remarks', 'material_request_id'
+    'material_name', 'board_feet', 'unit', 'thickness', 'width', 'length',
+    'supplier_id', 'purchase_order_id', 'material_request_id',
+    'delivery_date', 'receipt_path', 'remarks'
 ];
 
     // protected static function booted()

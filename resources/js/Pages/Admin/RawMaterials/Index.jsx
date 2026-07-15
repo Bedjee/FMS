@@ -1,52 +1,56 @@
 import AdminLayout from '@/Layouts/AdminLayout';
 import { Link } from '@inertiajs/react';
 
-export default function RawMaterialsIndex({ materials, summary }) {
+export default function DeliveryHistoryIndex({ materials, summary }) {
     return (
         <AdminLayout>
             <div className="space-y-6">
                 <div>
-                    <h1 className="text-2xl font-bold text-gray-900">Raw Materials Inventory</h1>
-                    <p className="text-gray-600">View all raw materials stock entries.</p>
+                    <h1 className="text-2xl font-bold text-gray-900">Delivery History</h1>
+                    <p className="text-gray-600">
+                        All incoming raw material deliveries. Each entry shows supplier, dimensions, and receipt details.
+                    </p>
                 </div>
 
-                {/* Summary Cards */}
-                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                    <div className="rounded-lg bg-white p-4 shadow border border-gray-200">
-                        <h3 className="text-sm font-medium text-gray-500">Mahogany</h3>
-                        <p className="text-2xl font-bold text-gray-900">{summary.Mahogany} BF</p>
-                    </div>
-                    <div className="rounded-lg bg-white p-4 shadow border border-gray-200">
-                        <h3 className="text-sm font-medium text-gray-500">Gemelina</h3>
-                        <p className="text-2xl font-bold text-gray-900">{summary.Gemelina} BF</p>
-                    </div>
+                {/* Summary Cards - Current Stock Balances */}
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                    {Object.entries(summary).map(([name, data]) => (
+                        <div key={name} className="rounded-lg bg-white p-4 shadow border border-gray-200">
+                            <h3 className="text-sm font-medium text-gray-500">{name}</h3>
+                            <p className="text-2xl font-bold text-gray-900">
+                                {parseFloat(data.total).toFixed(2)} <span className="text-sm font-normal text-gray-500">{data.unit}</span>
+                            </p>
+                        </div>
+                    ))}
                 </div>
 
-                {/* Table */}
+                {/* Deliveries Table */}
                 <div className="overflow-x-auto bg-white rounded-lg shadow border border-gray-200">
                     <table className="min-w-full divide-y divide-gray-200">
                         <thead className="bg-gray-50">
                             <tr>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">ID</th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Wood Type</th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Board Feet</th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Dimensions</th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Supplier</th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Delivery Date</th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
+                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
+                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Material</th>
+                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Quantity</th>
+                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Unit</th>
+                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Dimensions</th>
+                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Supplier</th>
+                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Delivery Date</th>
+                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-100">
                             {materials.data.map((material) => (
                                 <tr key={material.id} className="hover:bg-gray-50">
                                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{material.id}</td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{material.wood_type}</td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{material.board_feet}</td>
+                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{material.material_name}</td>
+                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{parseFloat(material.board_feet).toFixed(2)}</td>
+                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{material.unit || 'BF'}</td>
                                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-    {material.thickness > 0 && material.width > 0 && material.length > 0
-        ? `${material.thickness}" x ${material.width}" x ${material.length}'`
-        : '—'}
-</td>
+                                        {material.thickness > 0 && material.width > 0 && material.length > 0
+                                            ? `${material.thickness}" x ${material.width}" x ${material.length}'`
+                                            : '—'}
+                                    </td>
                                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{material.supplier?.name || '—'}</td>
                                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{material.delivery_date}</td>
                                     <td className="px-6 py-4 whitespace-nowrap text-sm">

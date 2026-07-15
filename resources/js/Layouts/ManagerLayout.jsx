@@ -7,7 +7,10 @@ import {
     ClipboardDocumentListIcon,
     WrenchScrewdriverIcon,
     ArrowRightOnRectangleIcon,
+    ShoppingBagIcon,
     HomeIcon,
+    DocumentTextIcon,
+    DocumentArrowDownIcon
 } from '@heroicons/react/24/outline';
 
 export default function ManagerLayout({ children }) {
@@ -29,6 +32,10 @@ export default function ManagerLayout({ children }) {
         { name: 'Material Requests', href: route('manager.material-requests.index'), icon: ClipboardDocumentListIcon },
         { name: 'Raw Materials', href: route('manager.raw-materials.index'), icon: CubeIcon },
         { name: 'Purchase Orders', href: route('manager.purchase-orders.index'), icon: ShoppingCartIcon },
+        { name: 'Products', href: route('manager.products.index'), icon: ClipboardDocumentListIcon },
+         { name: 'Inventory', href: route('manager.inventory.index'), icon: DocumentTextIcon }, // 👈 new
+         { name: 'Orders', href: route('manager.orders.index'), icon: ShoppingBagIcon },
+         { name: 'Reports', href: route('manager.report.index'), icon: DocumentArrowDownIcon },
         // { name: 'Products', href: route('manager.products.index'), icon: ClipboardDocumentListIcon },
         // { name: 'Work Orders', href: route('manager.work-orders.index'), icon: WrenchScrewdriverIcon },
     ];
